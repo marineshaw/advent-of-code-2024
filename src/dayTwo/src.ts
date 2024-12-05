@@ -1,24 +1,27 @@
 import { getLinesOfFile } from "../shared/getLinesFromFile";
 
+export const areLevelsDangerous = (
+  firstLevel: number,
+  secondLevel: number,
+  sign: number
+): boolean => {
+  if ((secondLevel - firstLevel) * sign < 0) {
+    return true;
+  }
+  return secondLevel === firstLevel || Math.abs(firstLevel - secondLevel) > 3;
+};
+
 export const isReportSafe = (list: number[]): boolean => {
   let isSafe = true;
-  list.forEach((level, index) => {
-    if (index < list.length - 1 && Math.abs(level - list[index + 1]) > 3) {
-      isSafe = false;
+  const sign = Math.sign(list[1] - list[0]);
+  if (sign === 0) {
+    return false;
+  }
+  for (let i = 0; i < list.length - 1; i++) {
+    if (isSafe) {
+      isSafe = !areLevelsDangerous(list[i], list[i + 1], sign);
     }
-  });
-  list.reduce((prev, current, index) => {
-    const prevValue = Math.abs(prev);
-    const prevSign = Math.sign(prev);
-    const sign = Math.sign(current - prevValue);
-    if (sign === 0 || (index !== 1 && prevSign != sign)) {
-      isSafe = false;
-    }
-    if (Math.abs(current - prevValue) > 3) {
-      isSafe = false;
-    }
-    return sign * current;
-  });
+  }
 
   return isSafe;
 };
@@ -28,6 +31,34 @@ export const computeSafeRecordsTotal = (records: number[][]): number => {
 
   records.forEach((record) => {
     if (isReportSafe(record)) {
+      safeTotal += 1;
+    }
+  });
+  return safeTotal;
+};
+
+export const isReportReallySafe = (list: number[]): boolean => {
+  let isSafe = isReportSafe(list);
+  if (isSafe) return true;
+
+  list.forEach((_, index) => {
+    const newList = [...list];
+    newList.splice(index, 1);
+    if (isReportSafe(newList)) {
+      isSafe = true;
+    }
+  });
+
+  return isSafe;
+};
+
+export const computeReallySafeRecordsTotal = (records: number[][]): number => {
+  let safeTotal = 0;
+
+  records.forEach((record) => {
+    if (isReportReallySafe(record) && !isReportSafe(record))
+      console.log(record);
+    if (isReportReallySafe(record)) {
       safeTotal += 1;
     }
   });
@@ -46,4 +77,9 @@ const records = await getInputRecords();
 console.log(
   "The total number of safe reports is ",
   computeSafeRecordsTotal(records)
+);
+
+console.log(
+  "The total number of really safe reports is ",
+  computeReallySafeRecordsTotal(records)
 );

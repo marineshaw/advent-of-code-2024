@@ -36,6 +36,22 @@ export const computeAllMul = (input: string) => {
   return total;
 };
 
+export const computeAllMulWithDo = (input: string) => {
+  let total = 0;
+  const dontParts = input.split("don't()");
+  dontParts.forEach((part, index) => {
+    const doIndex = part.indexOf("do()");
+    if (index === 0) {
+      total += computeAllMul(part);
+      return;
+    }
+    if (doIndex !== -1) {
+      total += computeAllMul(part.slice(doIndex));
+    }
+  });
+  return total;
+};
+
 const getInput = async () => {
   const lines = await getLinesOfFile("./src/dayThree/input.txt");
   let input = "";
@@ -51,3 +67,5 @@ const getInput = async () => {
 const input = await getInput();
 
 console.log("The total is", computeAllMul(input));
+
+console.log("The total with do and dont is", computeAllMulWithDo(input));

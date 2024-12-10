@@ -1,5 +1,5 @@
 import { expect, it } from "vitest";
-import { computeAllMul, computeMul } from "./src";
+import { computeAllMul, computeAllMulWithDo, computeMul } from "./src";
 
 it("multiplies two numbers if the syntax is correct", () => {
   expect(computeMul("(4,4326)")).toBe(17304);
@@ -27,4 +27,12 @@ it("compute all mul for given example", () => {
       "xmul(2,4)%&mul[3,7]!@^do_not_mul(5,5)+mul(32,64]then(mul(11,8)mul(8,5))"
     )
   ).toBe(161);
+});
+
+it.only("compute all mul with do and don't for given example", () => {
+  expect(
+    computeAllMulWithDo(
+      "xmul(2,4)&mul[3,7]!^don't()_mul(5,5)+mul(32,64](mul(11,8)undo()?mul(8,5))"
+    )
+  ).toBe(48);
 });
